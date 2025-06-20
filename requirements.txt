@@ -1,0 +1,8 @@
+flask
+matplotlib
+numpy
+selenium
+webdriver-manager
+torch
+scikit-learn
+sqlalchemy
