@@ -1,6 +1,7 @@
 """
-Bonus Task 4: Advanced Training Script
-Contains advanced training functions with learning rate scheduling, early stopping, and ensemble training.
+Bonus Task 4: Advanced Training Script (Fast Models Only)
+Contains advanced training functions with learning rate scheduling and early stopping.
+Streamlined to train only the fastest models for quick results.
 """
 
 import torch
@@ -24,8 +25,6 @@ from train import (
 )
 from models.advanced_models import (
     AdvancedResNetClassifier,
-    TransformerClassifier,
-    EnsembleClassifier,
     AttentionCNN,
 )
 from data_augmentation import augment_data
@@ -152,10 +151,11 @@ def evaluate_model(model, test_loader, website_names):
     return accuracy, class_accuracies
 
 
-def train_ensemble_models():
-    """Train multiple models and create an ensemble."""
-    print("=== Bonus Task 4: Advanced Model Training ===")
-    print("Goal: Beat the 74.6% accuracy of the Complex CNN model")
+def train_fast_models():
+    """Train only the fastest models for quick results."""
+    print("=== Bonus Task 4: Fast Advanced Model Training ===")
+    print("Goal: Beat the 74.6% accuracy with fast models only")
+    print("Training: Advanced ResNet + AttentionCNN (Est. 10-15 min)")
 
     # Load data from database
     print("\n1. Loading data from database...")
@@ -187,21 +187,16 @@ def train_ensemble_models():
         f"Input size: {input_size}, Hidden size: {hidden_size}, Classes: {num_classes}"
     )
 
-    # Initialize models
+    # Initialize only fast models
     models_to_train = {
         "advanced_resnet": AdvancedResNetClassifier(
             input_size, hidden_size, num_classes
         ),
-        "transformer": TransformerClassifier(input_size, hidden_size, num_classes),
         "attention_cnn": AttentionCNN(input_size, hidden_size, num_classes),
-        "enhanced_complex": ComplexFingerprintClassifier(
-            input_size, hidden_size, num_classes
-        ),
     }
 
     # Train individual models
-    print("\n4. Training individual models...")
-    trained_models = {}
+    print("\n4. Training fast models...")
     results = {}
 
     for model_name, model in models_to_train.items():
@@ -230,7 +225,6 @@ def train_ensemble_models():
         model.load_state_dict(torch.load(save_path))
         accuracy, class_accuracies = evaluate_model(model, test_loader, website_names)
 
-        trained_models[model_name] = model
         results[model_name] = {
             "accuracy": accuracy,
             "class_accuracies": class_accuracies,
@@ -239,26 +233,6 @@ def train_ensemble_models():
         print(f"{model_name} final accuracy: {accuracy:.4f}")
         for website, acc in class_accuracies.items():
             print(f"  {website}: {acc:.4f}")
-
-    # Create and train ensemble
-    print(f"\n--- Training Ensemble Model ---")
-    ensemble_model = EnsembleClassifier(list(trained_models.values()))
-
-    # Evaluate ensemble
-    ensemble_accuracy, ensemble_class_acc = evaluate_model(
-        ensemble_model, test_loader, website_names
-    )
-    results["ensemble"] = {
-        "accuracy": ensemble_accuracy,
-        "class_accuracies": ensemble_class_acc,
-    }
-
-    # Save ensemble
-    torch.save(ensemble_model.state_dict(), "../saved_models/ensemble_model.pth")
-
-    print(f"Ensemble final accuracy: {ensemble_accuracy:.4f}")
-    for website, acc in ensemble_class_acc.items():
-        print(f"  {website}: {acc:.4f}")
 
     # Summary
     print("\n=== RESULTS SUMMARY ===")
@@ -290,4 +264,4 @@ def train_ensemble_models():
 
 
 if __name__ == "__main__":
-    train_ensemble_models()
+    train_fast_models()
